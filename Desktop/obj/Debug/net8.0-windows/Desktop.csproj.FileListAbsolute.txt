@@ -1,0 +1,16 @@
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Desktop.exe
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Desktop.deps.json
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Desktop.runtimeconfig.json
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Desktop.dll
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Desktop.pdb
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.Form1.resources
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.csproj.GenerateResource.cache
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.GeneratedMSBuildEditorConfig.editorconfig
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.AssemblyInfoInputs.cache
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.AssemblyInfo.cs
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.csproj.CoreCompileInputs.cache
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.dll
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\refint\Desktop.dll
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.pdb
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.genruntimeconfig.cache
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\ref\Desktop.dll

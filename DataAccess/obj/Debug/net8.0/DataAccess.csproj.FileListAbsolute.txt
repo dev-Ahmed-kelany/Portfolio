@@ -1,0 +1,12 @@
+D:\Programming\Portfolio\DataAccess\bin\Debug\net8.0\DataAccess.deps.json
+D:\Programming\Portfolio\DataAccess\bin\Debug\net8.0\DataAccess.dll
+D:\Programming\Portfolio\DataAccess\bin\Debug\net8.0\DataAccess.pdb
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.csproj.AssemblyReference.cache
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.AssemblyInfoInputs.cache
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.AssemblyInfo.cs
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.csproj.CoreCompileInputs.cache
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.dll
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\refint\DataAccess.dll
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.pdb
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\ref\DataAccess.dll
