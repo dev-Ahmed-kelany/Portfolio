@@ -26,7 +26,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+<<<<<<< HEAD
 
 # My Files
 /.vs
 Information.txt
+=======
+>>>>>>> 80a333916f8009d2db0d81e9bae88ed3489fc052
