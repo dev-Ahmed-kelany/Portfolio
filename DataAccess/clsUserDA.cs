@@ -25,11 +25,14 @@ namespace Portfolio.DataAccess
         public long PersonID { get; set; }
     }
 
-    public interface IUser : IRepository<UserDTO>
+    public interface IUser
     {
+        Task<long> addNew(UserDTO User);
+        Task<bool> updateById(UserDTO User);
+        Task<bool> deleteById(long ID);
+        Task<UserWithoutPasswordDTO> getById(long ID);
+        Task<List<UserWithoutPasswordDTO>> getAll();
         Task<UserDTO> getUserByCredentials(string Username, string Password);
-        Task<List<UserWithoutPasswordDTO>> getAllUsersWithoutPassword();
-        Task<UserWithoutPasswordDTO> getUserByIdWithoutPassword(long ID);
     }
 
     public class clsUserDA : IUser
@@ -43,9 +46,9 @@ namespace Portfolio.DataAccess
             __Logger = Logger;
         }
 
-        public async Task<List<UserDTO>> getAll()
+        public async Task<List<UserWithoutPasswordDTO>> getAll()
         {
-            var list = new List<UserDTO>();
+            var list = new List<UserWithoutPasswordDTO>();
 
             try
             {
@@ -87,14 +90,13 @@ namespace Portfolio.DataAccess
                     {
                         if (reader.HasRows && reader.FieldCount >= 6)
                         {
-                            var userDTO = new UserDTO
+                            var userDTO = new UserWithoutPasswordDTO
                             {
                                 ID = !reader.IsDBNull(0) ? reader.GetInt64(0) : 0,
                                 Username = !reader.IsDBNull(1) ? (reader.GetString(1) ?? string.Empty) : string.Empty,
-                                Password = !reader.IsDBNull(2) ? (reader.GetString(2) ?? string.Empty) : string.Empty,
-                                IsActive = !reader.IsDBNull(3) ? reader.GetBoolean(3) : false,
-                                Permissions = !reader.IsDBNull(4) ? reader.GetInt64(4) : 0,
-                                PersonID = !reader.IsDBNull(5) ? reader.GetInt64(5) : 0
+                                IsActive = !reader.IsDBNull(2) ? reader.GetBoolean(2) : false,
+                                Permissions = !reader.IsDBNull(3) ? reader.GetInt64(3) : 0,
+                                PersonID = !reader.IsDBNull(4) ? reader.GetInt64(4) : 0
                             };
 
                             if (userDTO.ID <= 0)
@@ -143,90 +145,7 @@ namespace Portfolio.DataAccess
             }
         }
 
-        public async Task<List<UserWithoutPasswordDTO>> getAllUsersWithoutPassword()
-        {
-            var list = new List<UserWithoutPasswordDTO>();
-
-            try
-            {
-                __Logger?.LogInformation("Attempting to retrieve all users without password from database.");
-
-                if (__DataSource == null)
-                {
-                    __Logger?.LogError("DataSource is null. Cannot proceed with database operation.");
-                    throw new InvalidOperationException("DataSource is not initialized.");
-                }
-
-                await using var connection = await __DataSource.OpenConnectionAsync();
-
-                if (connection == null || connection.State != System.Data.ConnectionState.Open)
-                {
-                    __Logger?.LogError("Failed to establish database connection.");
-                    throw new InvalidOperationException("Unable to establish a connection to the database.");
-                }
-
-                await using var command = new NpgsqlCommand("SELECT * FROM getAllUsers()", connection);
-
-                await using var reader = await command.ExecuteReaderAsync();
-
-                if (reader == null)
-                {
-                    __Logger?.LogError("Failed to execute query. Reader is null.");
-                    throw new InvalidOperationException("Failed to execute database query.");
-                }
-
-                while (await reader.ReadAsync())
-                {
-                    try
-                    {
-                        if (reader.HasRows && reader.FieldCount >= 5)
-                        {
-                            var userDTO = new UserWithoutPasswordDTO
-                            {
-                                ID = !reader.IsDBNull(0) ? reader.GetInt64(0) : 0,
-                                Username = !reader.IsDBNull(1) ? (reader.GetString(1) ?? string.Empty) : string.Empty,
-                                IsActive = !reader.IsDBNull(3) ? reader.GetBoolean(3) : false,
-                                Permissions = !reader.IsDBNull(4) ? reader.GetInt64(4) : 0,
-                                PersonID = !reader.IsDBNull(5) ? reader.GetInt64(5) : 0
-                            };
-
-                            if (userDTO.ID <= 0)
-                            {
-                                __Logger?.LogWarning("Skipping record with invalid ID: {ID}", userDTO.ID);
-                                continue;
-                            }
-
-                            list.Add(userDTO);
-                        }
-                    }
-                    catch (InvalidOperationException ioEx)
-                    {
-                        __Logger?.LogWarning("Error reading row data: {Message}", ioEx.Message);
-                        continue;
-                    }
-                    catch (Exception rowEx)
-                    {
-                        __Logger?.LogError("Unexpected error while reading row: {Message}", rowEx.Message);
-                        continue;
-                    }
-                }
-
-                __Logger?.LogInformation("Successfully retrieved {Count} users without password from database.", list.Count);
-                return list;
-            }
-            catch (NpgsqlException npgsqlEx)
-            {
-                __Logger?.LogError(npgsqlEx, "PostgreSQL error occurred while retrieving all users without password.");
-                throw new InvalidOperationException("A database error occurred.", npgsqlEx);
-            }
-            catch (Exception ex)
-            {
-                __Logger?.LogError(ex, "Unexpected error occurred while retrieving all users without password.");
-                throw new Exception("An unexpected error occurred.", ex);
-            }
-        }
-
-        public async Task<UserDTO> getById(long ID)
+        public async Task<UserWithoutPasswordDTO> getById(long ID)
         {
             try
             {
@@ -261,81 +180,16 @@ namespace Portfolio.DataAccess
                 {
                     if (reader.HasRows && reader.FieldCount >= 6)
                     {
-                        var userDTO = new UserDTO
-                        {
-                            ID = !reader.IsDBNull(0) ? reader.GetInt64(0) : 0,
-                            Username = !reader.IsDBNull(1) ? (reader.GetString(1) ?? string.Empty) : string.Empty,
-                            Password = !reader.IsDBNull(2) ? (reader.GetString(2) ?? string.Empty) : string.Empty,
-                            IsActive = !reader.IsDBNull(3) ? reader.GetBoolean(3) : false,
-                            Permissions = !reader.IsDBNull(4) ? reader.GetInt64(4) : 0,
-                            PersonID = !reader.IsDBNull(5) ? reader.GetInt64(5) : 0
-                        };
-
-                        __Logger?.LogInformation("Successfully retrieved user record with ID: {ID}", ID);
-                        return userDTO;
-                    }
-                }
-
-                __Logger?.LogWarning("User record with ID: {ID} not found.", ID);
-                return new UserDTO();
-            }
-            catch (NpgsqlException npgsqlEx)
-            {
-                __Logger?.LogError(npgsqlEx, "PostgreSQL error occurred while retrieving user record with ID: {ID}", ID);
-                throw new InvalidOperationException("A database error occurred.", npgsqlEx);
-            }
-            catch (Exception ex)
-            {
-                __Logger?.LogError(ex, "Unexpected error occurred while retrieving user record with ID: {ID}", ID);
-                throw new Exception("An unexpected error occurred.", ex);
-            }
-        }
-
-        public async Task<UserWithoutPasswordDTO> getUserByIdWithoutPassword(long ID)
-        {
-            try
-            {
-                __Logger?.LogInformation("Attempting to retrieve user record without password with ID: {ID}", ID);
-
-                if (__DataSource == null)
-                {
-                    __Logger?.LogError("DataSource is null. Cannot proceed with database operation.");
-                    throw new InvalidOperationException("DataSource is not initialized.");
-                }
-
-                await using var connection = await __DataSource.OpenConnectionAsync();
-
-                if (connection == null || connection.State != System.Data.ConnectionState.Open)
-                {
-                    __Logger?.LogError("Failed to establish database connection.");
-                    throw new InvalidOperationException("Unable to establish a connection to the database.");
-                }
-
-                await using var command = new NpgsqlCommand("SELECT * FROM getUserById(@p_id)", connection);
-                command.Parameters.AddWithValue("@p_id", ID);
-
-                await using var reader = await command.ExecuteReaderAsync();
-
-                if (reader == null)
-                {
-                    __Logger?.LogError("Failed to execute query. Reader is null.");
-                    throw new InvalidOperationException("Failed to execute database query.");
-                }
-
-                if (await reader.ReadAsync())
-                {
-                    if (reader.HasRows && reader.FieldCount >= 5)
-                    {
                         var userDTO = new UserWithoutPasswordDTO
                         {
                             ID = !reader.IsDBNull(0) ? reader.GetInt64(0) : 0,
                             Username = !reader.IsDBNull(1) ? (reader.GetString(1) ?? string.Empty) : string.Empty,
-                            IsActive = !reader.IsDBNull(3) ? reader.GetBoolean(3) : false,
-                            Permissions = !reader.IsDBNull(4) ? reader.GetInt64(4) : 0,
-                            PersonID = !reader.IsDBNull(5) ? reader.GetInt64(5) : 0
+                            IsActive = !reader.IsDBNull(2) ? reader.GetBoolean(2) : false,
+                            Permissions = !reader.IsDBNull(3) ? reader.GetInt64(3) : 0,
+                            PersonID = !reader.IsDBNull(4) ? reader.GetInt64(4) : 0
                         };
 
-                        __Logger?.LogInformation("Successfully retrieved user record without password with ID: {ID}", ID);
+                        __Logger?.LogInformation("Successfully retrieved user record with ID: {ID}", ID);
                         return userDTO;
                     }
                 }
@@ -345,12 +199,12 @@ namespace Portfolio.DataAccess
             }
             catch (NpgsqlException npgsqlEx)
             {
-                __Logger?.LogError(npgsqlEx, "PostgreSQL error occurred while retrieving user record without password with ID: {ID}", ID);
+                __Logger?.LogError(npgsqlEx, "PostgreSQL error occurred while retrieving user record with ID: {ID}", ID);
                 throw new InvalidOperationException("A database error occurred.", npgsqlEx);
             }
             catch (Exception ex)
             {
-                __Logger?.LogError(ex, "Unexpected error occurred while retrieving user record without password with ID: {ID}", ID);
+                __Logger?.LogError(ex, "Unexpected error occurred while retrieving user record with ID: {ID}", ID);
                 throw new Exception("An unexpected error occurred.", ex);
             }
         }

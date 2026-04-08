@@ -13,13 +13,13 @@ namespace Portfolio.Business
 
         public async Task<List<UserWithoutPasswordDTO>> getAllUsers()
         {
-            var Users = await __User.getAllUsersWithoutPassword();
+            var Users = await __User.getAll();
             return Users;
         }
 
         public async Task<UserWithoutPasswordDTO> getUserById(long ID)
         {
-            var User = await __User.getUserByIdWithoutPassword(ID);
+            var User = await __User.getById(ID);
             return User;
         }
 
