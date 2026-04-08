@@ -53,6 +53,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Npgsql.DependencyInjection": {
+              "target": "Package",
+              "version": "[10.0.2, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -124,6 +130,10 @@
               "version": "[10.0.5, )"
             },
             "Npgsql": {
+              "target": "Package",
+              "version": "[10.0.2, )"
+            },
+            "Npgsql.DependencyInjection": {
               "target": "Package",
               "version": "[10.0.2, )"
             }

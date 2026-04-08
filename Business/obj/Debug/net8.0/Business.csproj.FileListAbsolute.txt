@@ -13,3 +13,4 @@ D:\Programming\Portfolio\Business\obj\Debug\net8.0\Business.dll
 D:\Programming\Portfolio\Business\obj\Debug\net8.0\refint\Business.dll
 D:\Programming\Portfolio\Business\obj\Debug\net8.0\Business.pdb
 D:\Programming\Portfolio\Business\obj\Debug\net8.0\ref\Business.dll
+D:\Programming\Portfolio\Business\obj\Debug\net8.0\Business.sourcelink.json

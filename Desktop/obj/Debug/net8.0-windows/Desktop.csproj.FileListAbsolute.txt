@@ -14,3 +14,11 @@ D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\refint\Desktop.dll
 D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.pdb
 D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.genruntimeconfig.cache
 D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\ref\Desktop.dll
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Npgsql.dll
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\Npgsql.DependencyInjection.dll
+D:\Programming\Portfolio\Desktop\bin\Debug\net8.0-windows\System.Diagnostics.DiagnosticSource.dll
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.csproj.AssemblyReference.cache
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.sourcelink.json
+D:\Programming\Portfolio\Desktop\obj\Debug\net8.0-windows\Desktop.csproj.Up2Date

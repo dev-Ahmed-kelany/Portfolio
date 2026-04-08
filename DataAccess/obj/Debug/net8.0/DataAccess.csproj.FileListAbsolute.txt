@@ -10,3 +10,4 @@ D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.dll
 D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\refint\DataAccess.dll
 D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.pdb
 D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\ref\DataAccess.dll
+D:\Programming\Portfolio\DataAccess\obj\Debug\net8.0\DataAccess.sourcelink.json

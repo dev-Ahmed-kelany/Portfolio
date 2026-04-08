@@ -89,6 +89,23 @@
           }
         }
       },
+      "Npgsql.DependencyInjection/10.0.2": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
+          "Npgsql": "10.0.2"
+        },
+        "compile": {
+          "lib/net8.0/Npgsql.DependencyInjection.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Npgsql.DependencyInjection.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "System.Diagnostics.DiagnosticSource/9.0.11": {
         "type": "package",
         "compile": {
@@ -290,6 +307,21 @@
         "postgresql.png"
       ]
     },
+    "Npgsql.DependencyInjection/10.0.2": {
+      "sha512": "/Efri6iP5Z2kj3amM/WPMoa0pzOBaIM+C+uMXltaBMu2hVZciNluuK51Mn2FmWKhqwTcMZdwHYUfbm8LbKRJMQ==",
+      "type": "package",
+      "path": "npgsql.dependencyinjection/10.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net8.0/Npgsql.DependencyInjection.dll",
+        "lib/net8.0/Npgsql.DependencyInjection.xml",
+        "npgsql.dependencyinjection.10.0.2.nupkg.sha512",
+        "npgsql.dependencyinjection.nuspec",
+        "postgresql.png"
+      ]
+    },
     "System.Diagnostics.DiagnosticSource/9.0.11": {
       "sha512": "/QzMFklOm8Ak//YB0I2kR+ByxUndT63ucrRWQm0xZsuLExJWrVDeGKtYZDuBackd9dThbwMdOotIEc4c4KwJiw==",
       "type": "package",
@@ -321,7 +353,8 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "Microsoft.Extensions.Configuration.Abstractions >= 10.0.5",
-      "Npgsql >= 10.0.2"
+      "Npgsql >= 10.0.2",
+      "Npgsql.DependencyInjection >= 10.0.2"
     ]
   },
   "packageFolders": {
@@ -379,6 +412,10 @@
             "version": "[10.0.5, )"
           },
           "Npgsql": {
+            "target": "Package",
+            "version": "[10.0.2, )"
+          },
+          "Npgsql.DependencyInjection": {
             "target": "Package",
             "version": "[10.0.2, )"
           }
