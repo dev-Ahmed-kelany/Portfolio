@@ -220,12 +220,12 @@ namespace Portfolio.DataAccess
                     throw new InvalidOperationException("Unable to establish a connection to the database.");
                 }
 
-                await using var command = new NpgsqlCommand("SELECT * FROM addNewExperience(@p_name, @p_description, @p_companyname, @p_startdate, @p_enddate, @p_personid)", connection);
+                await using var command = new NpgsqlCommand("SELECT * FROM addnewexperience(@p_name, @p_desc, @p_company, @p_start, @p_end, @p_personid)", connection);
                 command.Parameters.AddWithValue("@p_name", experience.Name ?? string.Empty);
-                command.Parameters.AddWithValue("@p_description", experience.Description ?? string.Empty);
-                command.Parameters.AddWithValue("@p_companyname", experience.CompanyName ?? string.Empty);
-                command.Parameters.AddWithValue("@p_startdate", experience.StartDate);
-                command.Parameters.AddWithValue("@p_enddate", experience.EndDate ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@p_desc", experience.Description ?? string.Empty);
+                command.Parameters.AddWithValue("@p_company", experience.CompanyName ?? string.Empty);
+                command.Parameters.AddWithValue("@p_start", NpgsqlTypes.NpgsqlDbType.Date, experience.StartDate);
+                command.Parameters.AddWithValue("@p_end", NpgsqlTypes.NpgsqlDbType.Date, experience.EndDate ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@p_personid", experience.PersonID);
 
                 await using var reader = await command.ExecuteReaderAsync();
@@ -278,13 +278,13 @@ namespace Portfolio.DataAccess
                     throw new InvalidOperationException("Unable to establish a connection to the database.");
                 }
 
-                await using var command = new NpgsqlCommand("SELECT * FROM updateExperienceById(@p_id, @p_name, @p_description, @p_companyname, @p_startdate, @p_enddate, @p_personid)", connection);
+                await using var command = new NpgsqlCommand("SELECT updateExperienceById(@p_id, @p_name, @p_description, @p_companyname, @p_startdate, @p_enddate, @p_personid)", connection);
                 command.Parameters.AddWithValue("@p_id", experience.ID);
                 command.Parameters.AddWithValue("@p_name", experience.Name ?? string.Empty);
                 command.Parameters.AddWithValue("@p_description", experience.Description ?? string.Empty);
                 command.Parameters.AddWithValue("@p_companyname", experience.CompanyName ?? string.Empty);
-                command.Parameters.AddWithValue("@p_startdate", experience.StartDate);
-                command.Parameters.AddWithValue("@p_enddate", experience.EndDate ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@p_startdate", NpgsqlTypes.NpgsqlDbType.Date, experience.StartDate);
+                command.Parameters.AddWithValue("@p_enddate", NpgsqlTypes.NpgsqlDbType.Date, experience.EndDate ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@p_personid", experience.PersonID);
 
                 var result = await command.ExecuteScalarAsync();
@@ -330,7 +330,7 @@ namespace Portfolio.DataAccess
                     throw new InvalidOperationException("Unable to establish a connection to the database.");
                 }
 
-                await using var command = new NpgsqlCommand("SELECT * FROM deleteExperienceById(@p_id)", connection);
+                await using var command = new NpgsqlCommand("SELECT deleteExperienceById(@p_id)", connection);
                 command.Parameters.AddWithValue("@p_id", ID);
 
                 var result = await command.ExecuteScalarAsync();

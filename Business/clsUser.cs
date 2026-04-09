@@ -23,7 +23,7 @@ namespace Portfolio.Business
             return User;
         }
 
-        public async Task<UserDTO> getUserByCredentials(string Username, string Password)
+        public async Task<UserWithoutPasswordDTO> getUserByCredentials(string Username, string Password)
         {
             var User = await __User.getUserByCredentials(Username, Password);
             return User;
@@ -38,6 +38,18 @@ namespace Portfolio.Business
         public async Task<bool> updateUserById(UserDTO user)
         {
             var result = await __User.updateById(user);
+            return result;
+        }
+
+        public async Task<bool> toogleActive(long ID, bool Active)
+        {
+            var result = await __User.toogleActive(ID, Active);
+            return result;
+        }
+
+        public async Task<bool> changePassword(long ID, string currentPassword, string newPassword)
+        {
+            var result = await __User.changePassword(ID, currentPassword, newPassword);
             return result;
         }
 

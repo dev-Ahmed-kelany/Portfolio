@@ -266,7 +266,7 @@ namespace Portfolio.DataAccess
                     throw new InvalidOperationException("Unable to establish a connection to the database.");
                 }
 
-                await using var command = new NpgsqlCommand("SELECT * FROM updateJobTitleById(@p_id, @p_title, @p_isactive, @p_personid)", connection);
+                await using var command = new NpgsqlCommand("SELECT updateJobTitleById(@p_id, @p_title, @p_isactive, @p_personid)", connection);
                 command.Parameters.AddWithValue("@p_id", jobTitle.ID);
                 command.Parameters.AddWithValue("@p_title", jobTitle.Title ?? string.Empty);
                 command.Parameters.AddWithValue("@p_isactive", jobTitle.IsActive);
@@ -315,7 +315,7 @@ namespace Portfolio.DataAccess
                     throw new InvalidOperationException("Unable to establish a connection to the database.");
                 }
 
-                await using var command = new NpgsqlCommand("SELECT * FROM deleteJobTitleById(@p_id)", connection);
+                await using var command = new NpgsqlCommand("SELECT deleteJobTitleById(@p_id)", connection);
                 command.Parameters.AddWithValue("@p_id", ID);
 
                 var result = await command.ExecuteScalarAsync();

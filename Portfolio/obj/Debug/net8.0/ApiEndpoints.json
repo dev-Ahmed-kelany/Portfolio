@@ -2647,7 +2647,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Portfolio.DataAccess.UserDTO",
+        "Type": "Portfolio.DataAccess.UserWithoutPasswordDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",

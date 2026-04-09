@@ -109,11 +109,11 @@ namespace PortfolioAPI.Controllers
         /// <response code="401">Unauthorized - invalid credentials</response>
         /// <response code="500">Internal server error</response>
         [HttpPost("authenticate")]
-        [ProducesResponseType(typeof(UserDTO), 200)]
+        [ProducesResponseType(typeof(UserWithoutPasswordDTO), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<UserDTO>> Authenticate([FromBody] UserCredentialsRequest credentials)
+        public async Task<ActionResult<UserWithoutPasswordDTO>> Authenticate([FromBody] UserCredentialsRequest credentials)
         {
             try
             {
@@ -367,14 +367,7 @@ namespace PortfolioAPI.Controllers
                     return BadRequest(new { message = "Invalid user ID" });
                 }
 
-                // Create a temporary user DTO with updated status
-                var userToUpdate = new UserDTO
-                {
-                    ID = id,
-                    IsActive = isActive
-                };
-
-                var ok = await __User.updateUserById(userToUpdate);
+                var ok = await __User.toogleActive(id, isActive);
 
                 if (!ok)
                 {
@@ -444,14 +437,7 @@ namespace PortfolioAPI.Controllers
                     return BadRequest(new { message = "New password must be different from current password" });
                 }
 
-                // Create UserDTO with new password for update
-                var userToUpdate = new UserDTO
-                {
-                    ID = id,
-                    Password = passwordChange.NewPassword
-                };
-
-                var ok = await __User.updateUserById(userToUpdate);
+                var ok = await __User.changePassword(id, passwordChange.CurrentPassword, passwordChange.NewPassword);
 
                 if (!ok)
                 {
