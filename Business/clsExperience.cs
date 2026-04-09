@@ -31,18 +31,30 @@ namespace Portfolio.Business
 
         public async Task<long> addNewExperience(ExperienceDTO experience)
         {
+            if (!clsValidation.IsValidExperienceDTO(experience))
+                return 0;
+
             var newId = await __Experience.addNew(experience);
             return newId;
         }
 
         public async Task<bool> updateExperienceById(ExperienceDTO experience)
         {
+            if (!clsValidation.IsValidExperienceDTO(experience))
+                return false;
+
+            if (!clsValidation.IsValidId(experience.ID))
+                return false;
+
             var result = await __Experience.updateById(experience);
             return result;
         }
 
         public async Task<bool> deleteExperienceById(long ID)
         {
+            if (!clsValidation.IsValidId(ID))
+                return false;
+
             var result = await __Experience.deleteById(ID);
             return result;
         }

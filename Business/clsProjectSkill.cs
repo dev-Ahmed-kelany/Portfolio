@@ -25,18 +25,30 @@ namespace Portfolio.Business
 
         public async Task<long> addNewProjectSkill(ProjectSkillDTO projectSkill)
         {
+            if (!clsValidation.IsValidProjectSkillDTO(projectSkill))
+                return 0;
+
             var newId = await __ProjectSkill.addNew(projectSkill);
             return newId;
         }
 
         public async Task<bool> updateProjectSkillById(ProjectSkillDTO projectSkill)
         {
+            if (!clsValidation.IsValidProjectSkillDTO(projectSkill))
+                return false;
+
+            if (!clsValidation.IsValidId(projectSkill.ID))
+                return false;
+
             var result = await __ProjectSkill.updateById(projectSkill);
             return result;
         }
 
         public async Task<bool> deleteProjectSkillById(long ID)
         {
+            if (!clsValidation.IsValidId(ID))
+                return false;
+
             var result = await __ProjectSkill.deleteById(ID);
             return result;
         }

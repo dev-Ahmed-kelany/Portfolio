@@ -25,18 +25,30 @@ namespace Portfolio.Business
 
         public async Task<long> addNewSkillCategory(SkillCategoryDTO skillCategory)
         {
+            if (!clsValidation.IsValidSkillCategoryDTO(skillCategory))
+                return 0;
+
             var newId = await __SkillCategory.addNew(skillCategory);
             return newId;
         }
 
         public async Task<bool> updateSkillCategoryById(SkillCategoryDTO skillCategory)
         {
+            if (!clsValidation.IsValidSkillCategoryDTO(skillCategory))
+                return false;
+
+            if (!clsValidation.IsValidId(skillCategory.ID))
+                return false;
+
             var result = await __SkillCategory.updateById(skillCategory);
             return result;
         }
 
         public async Task<bool> deleteSkillCategoryById(long ID)
         {
+            if (!clsValidation.IsValidId(ID))
+                return false;
+
             var result = await __SkillCategory.deleteById(ID);
             return result;
         }

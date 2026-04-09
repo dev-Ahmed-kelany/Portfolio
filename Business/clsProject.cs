@@ -31,18 +31,30 @@ namespace Portfolio.Business
 
         public async Task<long> addNewProject(ProjectDTO project)
         {
+            if (!clsValidation.IsValidProjectDTO(project))
+                return 0;
+
             var newId = await __Project.addNew(project);
             return newId;
         }
 
         public async Task<bool> updateProjectById(ProjectDTO project)
         {
+            if (!clsValidation.IsValidProjectDTO(project))
+                return false;
+
+            if (!clsValidation.IsValidId(project.ID))
+                return false;
+
             var result = await __Project.updateById(project);
             return result;
         }
 
         public async Task<bool> deleteProjectById(long ID)
         {
+            if (!clsValidation.IsValidId(ID))
+                return false;
+
             var result = await __Project.deleteById(ID);
             return result;
         }

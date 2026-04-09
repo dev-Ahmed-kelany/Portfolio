@@ -31,18 +31,30 @@ namespace Portfolio.Business
 
         public async Task<long> addNewAbout(AboutDTO about)
         {
+            if (!clsValidation.IsValidAboutDTO(about))
+                return 0;
+
             var newId = await __About.addNew(about);
             return newId;
         }
 
         public async Task<bool> updateAboutById(AboutDTO about)
         {
+            if (!clsValidation.IsValidAboutDTO(about))
+                return false;
+
+            if (!clsValidation.IsValidId(about.ID))
+                return false;
+
             var result = await __About.updateById(about);
             return result;
         }
 
         public async Task<bool> deleteAboutById(long ID)
         {
+            if (!clsValidation.IsValidId(ID))
+                return false;
+
             var result = await __About.deleteById(ID);
             return result;
         }
