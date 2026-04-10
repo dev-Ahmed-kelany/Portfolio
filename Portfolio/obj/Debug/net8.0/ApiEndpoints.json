@@ -2379,7 +2379,7 @@
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "Portfolio.DataAccess.UserDTO",
+        "Type": "PortfolioAPI.Controllers.UserCreateDTO",
         "IsRequired": true
       }
     ],
@@ -2460,7 +2460,7 @@
       },
       {
         "Name": "dto",
-        "Type": "Portfolio.DataAccess.UserDTO",
+        "Type": "Portfolio.DataAccess.UserWithoutPasswordDTO",
         "IsRequired": true
       }
     ],

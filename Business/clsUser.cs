@@ -1,3 +1,4 @@
+using Business;
 using Portfolio.DataAccess;
 
 namespace Portfolio.Business
@@ -25,8 +26,13 @@ namespace Portfolio.Business
 
         public async Task<UserWithoutPasswordDTO> getUserByCredentials(string Username, string Password)
         {
-            var User = await __User.getUserByCredentials(Username, Password);
-            return User;
+            var User = await __User.getUserByUsername(Username);
+
+            bool isValid = clsSecurity.VerifyPassword(Password, User.PasswordHash, User.PasswordSalt);
+
+            if (isValid) return new UserWithoutPasswordDTO { ID = User.ID, Username = User.Username, IsActive = User.IsActive, Permissions = User.Permissions, PersonID = User.PersonID };
+
+            return null;
         }
 
         public async Task<long> addNewUser(UserDTO user)
@@ -34,13 +40,22 @@ namespace Portfolio.Business
             if (!clsValidation.IsValidUserDTO(user))
                 return 0;
 
+            byte[] salt = clsSecurity.GenerateSalt();
+            string hash = clsSecurity.HashPassword(user.Password, salt);
+
+            user.PasswordHash = hash;
+            user.PasswordSalt = Convert.ToBase64String(salt);
+
+            // Remove plain password
+            user.Password = null;
+
             var newId = await __User.addNew(user);
             return newId;
         }
 
-        public async Task<bool> updateUserById(UserDTO user)
+        public async Task<bool> updateUserById(UserWithoutPasswordDTO user)
         {
-            if (!clsValidation.IsValidUserDTO(user))
+            if (!clsValidation.IsValidUserWithoutPasswordDTO(user))
                 return false;
 
             if (!clsValidation.IsValidId(user.ID))
@@ -70,7 +85,18 @@ namespace Portfolio.Business
             if (clsValidation.IsNullOrEmpty(newPassword) || !clsValidation.IsWithinLength(newPassword, 5, 100))
                 return false;
 
-            var result = await __User.changePassword(ID, currentPassword, newPassword);
+            var User = await __User.getFullUserById(ID);
+
+            bool isValid = clsSecurity.VerifyPassword(currentPassword, User.PasswordHash, User.PasswordSalt);
+
+            if (!isValid) return false;
+
+            byte[] salt = clsSecurity.GenerateSalt();
+            string PasswordHash = clsSecurity.HashPassword(newPassword, salt);
+
+            string PasswordSalt = Convert.ToBase64String(salt);
+
+            var result = await __User.changePassword(ID, PasswordHash, PasswordSalt);
             return result;
         }
 

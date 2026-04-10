@@ -11,6 +11,8 @@ namespace Portfolio.DataAccess
         public long ID { get; set; }
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public string PasswordSalt { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public long Permissions { get; set; }
         public long PersonID { get; set; }
@@ -28,13 +30,14 @@ namespace Portfolio.DataAccess
     public interface IUser
     {
         Task<long> addNew(UserDTO User);
-        Task<bool> updateById(UserDTO User);
+        Task<bool> updateById(UserWithoutPasswordDTO User);
         Task<bool> toogleActive(long ID, bool Active);
-        Task<bool> changePassword(long ID, string currentPassword, string newPassword);
+        Task<bool> changePassword(long ID, string PasswordHash, string PasswordSalt);
         Task<bool> deleteById(long ID);
         Task<UserWithoutPasswordDTO> getById(long ID);
+        Task<UserDTO> getFullUserById(long ID);
         Task<List<UserWithoutPasswordDTO>> getAll();
-        Task<UserWithoutPasswordDTO> getUserByCredentials(string Username, string Password);
+        Task<UserDTO> getUserByUsername(string Username);
     }
 
     public class clsUserDA : IUser
@@ -211,6 +214,72 @@ namespace Portfolio.DataAccess
             }
         }
 
+        public async Task<UserDTO> getFullUserById(long ID)
+        {
+            try
+            {
+                __Logger?.LogInformation("Attempting to retrieve user record with ID: {ID}", ID);
+
+                if (__DataSource == null)
+                {
+                    __Logger?.LogError("DataSource is null. Cannot proceed with database operation.");
+                    throw new InvalidOperationException("DataSource is not initialized.");
+                }
+
+                await using var connection = await __DataSource.OpenConnectionAsync();
+
+                if (connection == null || connection.State != System.Data.ConnectionState.Open)
+                {
+                    __Logger?.LogError("Failed to establish database connection.");
+                    throw new InvalidOperationException("Unable to establish a connection to the database.");
+                }
+
+                await using var command = new NpgsqlCommand("SELECT * FROM getFullUserById(@p_id)", connection);
+                command.Parameters.AddWithValue("@p_id", ID);
+
+                await using var reader = await command.ExecuteReaderAsync();
+
+                if (reader == null)
+                {
+                    __Logger?.LogError("Failed to execute query. Reader is null.");
+                    throw new InvalidOperationException("Failed to execute database query.");
+                }
+
+                if (await reader.ReadAsync())
+                {
+                    if (reader.HasRows && reader.FieldCount >= 5)
+                    {
+                        var userDTO = new UserDTO
+                        {
+                            ID = !reader.IsDBNull(0) ? reader.GetInt64(0) : 0,
+                            Username = !reader.IsDBNull(1) ? (reader.GetString(1) ?? string.Empty) : string.Empty,
+                            PasswordHash = !reader.IsDBNull(2) ? (reader.GetString(2) ?? string.Empty) : string.Empty,
+                            PasswordSalt = !reader.IsDBNull(3) ? (reader.GetString(3) ?? string.Empty) : string.Empty,
+                            IsActive = !reader.IsDBNull(4) ? reader.GetBoolean(4) : false,
+                            Permissions = !reader.IsDBNull(5) ? reader.GetInt64(5) : 0,
+                            PersonID = !reader.IsDBNull(6) ? reader.GetInt64(6) : 0
+                        };
+
+                        __Logger?.LogInformation("Successfully retrieved user record with ID: {ID}", ID);
+                        return userDTO;
+                    }
+                }
+
+                __Logger?.LogWarning("User record with ID: {ID} not found.", ID);
+                return new UserDTO();
+            }
+            catch (NpgsqlException npgsqlEx)
+            {
+                __Logger?.LogError(npgsqlEx, "PostgreSQL error occurred while retrieving user record with ID: {ID}", ID);
+                throw new InvalidOperationException("A database error occurred.", npgsqlEx);
+            }
+            catch (Exception ex)
+            {
+                __Logger?.LogError(ex, "Unexpected error occurred while retrieving user record with ID: {ID}", ID);
+                throw new Exception("An unexpected error occurred.", ex);
+            }
+        }
+
         public async Task<long> addNew(UserDTO user)
         {
             try
@@ -231,9 +300,10 @@ namespace Portfolio.DataAccess
                     throw new InvalidOperationException("Unable to establish a connection to the database.");
                 }
 
-                await using var command = new NpgsqlCommand("SELECT * FROM addNewUser(@p_username, @p_password, @p_isactive, @p_permissions, @p_personid)", connection);
+                await using var command = new NpgsqlCommand("SELECT * FROM addNewUser(@p_username, @p_passwordhash, @p_passwordsalt, @p_isactive, @p_permissions, @p_personid)", connection);
                 command.Parameters.AddWithValue("@p_username", user.Username ?? string.Empty);
-                command.Parameters.AddWithValue("@p_password", user.Password ?? string.Empty);
+                command.Parameters.AddWithValue("@p_passwordhash", user.PasswordHash ?? string.Empty);
+                command.Parameters.AddWithValue("@p_passwordsalt", user.PasswordSalt ?? string.Empty);
                 command.Parameters.AddWithValue("@p_isactive", user.IsActive);
                 command.Parameters.AddWithValue("@p_permissions", user.Permissions);
                 command.Parameters.AddWithValue("@p_personid", user.PersonID);
@@ -268,7 +338,7 @@ namespace Portfolio.DataAccess
             }
         }
 
-        public async Task<bool> updateById(UserDTO user)
+        public async Task<bool> updateById(UserWithoutPasswordDTO user)
         {
             try
             {
@@ -364,7 +434,8 @@ namespace Portfolio.DataAccess
                 throw new Exception("An unexpected error occurred.", ex);
             }
         }
-        public async Task<bool> changePassword(long ID, string currentPassword, string newPassword)
+
+        public async Task<bool> changePassword(long ID, string PasswordHash, string PasswordSalt)
         {
             try
             {
@@ -384,10 +455,10 @@ namespace Portfolio.DataAccess
                     throw new InvalidOperationException("Unable to establish a connection to the database.");
                 }
 
-                await using var command = new NpgsqlCommand("SELECT changePassword(@p_id, @p_currentPassword, @p_newPassword)", connection);
+                await using var command = new NpgsqlCommand("SELECT changePassword(@p_id, @p_PasswordHash, @p_passwordSalt)", connection);
                 command.Parameters.AddWithValue("@p_id", ID);
-                command.Parameters.AddWithValue("@p_currentPassword", currentPassword);
-                command.Parameters.AddWithValue("@p_newPassword", newPassword);
+                command.Parameters.AddWithValue("@p_PasswordHash", PasswordHash);
+                command.Parameters.AddWithValue("@p_passwordSalt", PasswordSalt);
 
                 var result = await command.ExecuteScalarAsync();
 
@@ -458,7 +529,7 @@ namespace Portfolio.DataAccess
             }
         }
 
-        public async Task<UserWithoutPasswordDTO> getUserByCredentials(string Username, string Password)
+        public async Task<UserDTO> getUserByUsername(string Username)
         {
             try
             {
@@ -478,9 +549,8 @@ namespace Portfolio.DataAccess
                     throw new InvalidOperationException("Unable to establish a connection to the database.");
                 }
 
-                await using var command = new NpgsqlCommand("SELECT * FROM getUserByCredentials(@p_username, @p_password)", connection);
+                await using var command = new NpgsqlCommand("SELECT * FROM getUserByUsername(@p_username)", connection);
                 command.Parameters.AddWithValue("@p_username", Username ?? string.Empty);
-                command.Parameters.AddWithValue("@p_password", Password ?? string.Empty);
 
                 await using var reader = await command.ExecuteReaderAsync();
 
@@ -494,13 +564,15 @@ namespace Portfolio.DataAccess
                 {
                     if (reader.HasRows && reader.FieldCount >= 5)
                     {
-                        var userDTO = new UserWithoutPasswordDTO
+                        var userDTO = new UserDTO
                         {
                             ID = !reader.IsDBNull(0) ? reader.GetInt64(0) : 0,
                             Username = !reader.IsDBNull(1) ? (reader.GetString(1) ?? string.Empty) : string.Empty,
-                            IsActive = !reader.IsDBNull(2) ? reader.GetBoolean(2) : false,
-                            Permissions = !reader.IsDBNull(3) ? reader.GetInt64(3) : 0,
-                            PersonID = !reader.IsDBNull(4) ? reader.GetInt64(4) : 0
+                            PasswordHash = !reader.IsDBNull(2) ? (reader.GetString(2) ?? string.Empty) : string.Empty,
+                            PasswordSalt = !reader.IsDBNull(3) ? (reader.GetString(3) ?? string.Empty) : string.Empty,
+                            IsActive = !reader.IsDBNull(4) ? reader.GetBoolean(4) : false,
+                            Permissions = !reader.IsDBNull(5) ? reader.GetInt64(5) : 0,
+                            PersonID = !reader.IsDBNull(6) ? reader.GetInt64(6) : 0
                         };
 
                         __Logger?.LogInformation("Successfully retrieved user by credentials for username: {Username}", Username);
@@ -509,7 +581,7 @@ namespace Portfolio.DataAccess
                 }
 
                 __Logger?.LogWarning("User not found for username: {Username}", Username);
-                return new UserWithoutPasswordDTO();
+                return new UserDTO();
             }
             catch (NpgsqlException npgsqlEx)
             {

@@ -174,7 +174,7 @@ namespace PortfolioAPI.Controllers
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult> Create([FromBody] UserDTO dto)
+        public async Task<ActionResult> Create([FromBody] UserCreateDTO dto)
         {
             try
             {
@@ -204,7 +204,17 @@ namespace PortfolioAPI.Controllers
                     return BadRequest(new { message = "Valid PersonID is required" });
                 }
 
-                var id = await __User.addNewUser(dto);
+                var userdto = new UserDTO
+                {
+                    ID = dto.ID,
+                    Username = dto.Username,
+                    Password = dto.Password,
+                    IsActive = dto.IsActive,
+                    Permissions = dto.Permissions,
+                    PersonID = dto.PersonID
+                };
+
+                var id = await __User.addNewUser(userdto);
 
                 if (id <= 0)
                 {
@@ -242,7 +252,7 @@ namespace PortfolioAPI.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult> Update(long id, [FromBody] UserDTO dto)
+        public async Task<ActionResult> Update(long id, [FromBody] UserWithoutPasswordDTO dto)
         {
             try
             {
@@ -468,6 +478,16 @@ namespace PortfolioAPI.Controllers
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class UserCreateDTO
+    {
+        public long ID { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+        public long Permissions { get; set; }
+        public long PersonID { get; set; }
     }
 
     /// <summary>

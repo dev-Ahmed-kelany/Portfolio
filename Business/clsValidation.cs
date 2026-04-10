@@ -100,6 +100,20 @@ namespace Portfolio.Business
             return true;
         }
 
+        public static bool IsValidUserWithoutPasswordDTO(UserWithoutPasswordDTO user)
+        {
+            if (user == null)
+                return false;
+
+            if (IsNullOrEmpty(user.Username) || !IsWithinLength(user.Username, 3, 50))
+                return false;
+
+            if (!IsValidPersonId(user.PersonID))
+                return false;
+
+            return true;
+        }
+
         // Validate PersonDTO
         public static bool IsValidPersonDTO(PersonDTO person)
         {

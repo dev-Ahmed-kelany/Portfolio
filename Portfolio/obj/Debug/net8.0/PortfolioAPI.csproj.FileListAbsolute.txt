@@ -43,3 +43,5 @@ D:\Programming\Portfolio\Portfolio\obj\Debug\net8.0\PortfolioAPI.genruntimeconfi
 D:\Programming\Portfolio\Portfolio\obj\Debug\net8.0\ref\PortfolioAPI.dll
 D:\Programming\Portfolio\Portfolio\obj\Debug\net8.0\PortfolioAPI.sourcelink.json
 D:\Programming\Portfolio\Portfolio\bin\Debug\net8.0\Npgsql.DependencyInjection.dll
+D:\Programming\Portfolio\Portfolio\bin\Debug\net8.0\Konscious.Security.Cryptography.Argon2.dll
+D:\Programming\Portfolio\Portfolio\bin\Debug\net8.0\Konscious.Security.Cryptography.Blake2.dll
