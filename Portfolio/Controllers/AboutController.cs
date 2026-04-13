@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Business;
 using Portfolio.DataAccess;
+using System.Security.Claims;
 
 namespace PortfolioAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/About")]
     public class AboutController : Controller
@@ -18,6 +21,7 @@ namespace PortfolioAPI.Controllers
         /// <summary>
         /// Get all about records
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [ProducesResponseType(typeof(List<AboutDTO>), 200)]
         [ProducesResponseType(500)]
@@ -55,6 +59,7 @@ namespace PortfolioAPI.Controllers
         /// <summary>
         /// Get about by person id
         /// </summary>
+        [AllowAnonymous]
         [HttpGet("person/{personId:long}")]
         [ProducesResponseType(typeof(AboutDTO), 200)]
         [ProducesResponseType(404)]

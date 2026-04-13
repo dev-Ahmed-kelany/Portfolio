@@ -1,9 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Business;
 using Portfolio.DataAccess;
+using System.Security.Claims;
+using System.Text;
+using System.Linq;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace PortfolioAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/Users")]
     public class UserController : Controller
@@ -26,6 +34,7 @@ namespace PortfolioAPI.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(List<UserWithoutPasswordDTO>), 200)]
         [ProducesResponseType(500)]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<UserWithoutPasswordDTO>>> GetAll()
         {
             try
@@ -113,6 +122,7 @@ namespace PortfolioAPI.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(500)]
+        [AllowAnonymous]
         public async Task<ActionResult<UserWithoutPasswordDTO>> Authenticate([FromBody] UserCredentialsRequest credentials)
         {
             try
@@ -145,10 +155,29 @@ namespace PortfolioAPI.Controllers
                     return Unauthorized(new { message = "User account is inactive" });
                 }
 
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
+                    new Claim(ClaimTypes.UserData, user.Username.ToString()),
+                    new Claim(ClaimTypes.Role, ((user.Permissions & 1) == 1 ? "Admin" : "User").ToString())
+                };
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("THIS_IS_A_VERY_SECRET_KEY_123456"));
+
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                var token = new JwtSecurityToken(
+                    issuer: "PortfolioApi",
+                    audience: "PortfolioApiUsers",
+                    claims: claims,
+                    expires: DateTime.Now.AddMinutes(30),
+                    signingCredentials: creds
+                    );
+
                 __Logger.LogInformation("Successful authentication for user: {UserId}", user.ID);
                 
                 // In production, you should return a JWT token here instead of the user object
-                return Ok(user);
+                return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
             }
             catch (InvalidOperationException ex)
             {
@@ -174,6 +203,7 @@ namespace PortfolioAPI.Controllers
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Create([FromBody] UserCreateDTO dto)
         {
             try

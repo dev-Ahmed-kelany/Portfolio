@@ -47,7 +47,7 @@ namespace Portfolio.Business
             user.PasswordSalt = Convert.ToBase64String(salt);
 
             // Remove plain password
-            user.Password = null;
+            user.Password = "";
 
             var newId = await __User.addNew(user);
             return newId;

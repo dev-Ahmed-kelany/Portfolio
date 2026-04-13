@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Business;
 using Portfolio.DataAccess;
 
 namespace PortfolioAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/PersonSkills")]
     public class PersonSkillController : Controller
@@ -18,6 +20,7 @@ namespace PortfolioAPI.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(List<PersonSkillDTO>), 200)]
         [ProducesResponseType(500)]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<PersonSkillDTO>>> GetAll()
         {
             try { return Ok(await __PersonSkill.getAllPersonSkills()); }
@@ -42,6 +45,7 @@ namespace PortfolioAPI.Controllers
         [HttpGet("person/{personId:long}")]
         [ProducesResponseType(typeof(List<PersonSkillDTO>), 200)]
         [ProducesResponseType(500)]
+        [AllowAnonymous]
         public async Task<ActionResult<List<PersonSkillDTO>>> GetByPerson(long personId)
         {
             try { return Ok(await __PersonSkill.getPersonSkillsByPerson(personId)); }

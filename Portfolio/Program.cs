@@ -1,7 +1,8 @@
-using Microsoft.OpenApi;
-using Npgsql;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Portfolio.Business;
 using Portfolio.DataAccess;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,13 +12,6 @@ clsSettings.SetConnectionString(builder.Configuration);
 // Add services to the container.
 
 // DataSource
-//builder.Services.AddSingleton<NpgsqlDataSource>(sp =>
-//{
-//    return NpgsqlDataSource.Create(clsSettings.ConnectionString);
-//});
-
-//builder.Services.AddNpgsqlDataSource(clsSettings.ConnectionString);
-
 builder.Services.AddNpgsqlDataSource(clsSettings.ConnectionString);
 
 // Repositories (Data Access)
@@ -50,12 +44,6 @@ builder.Services.AddScoped<clsSocialLink>();
 builder.Services.AddScoped<clsUser>();
 builder.Services.AddScoped<clsSkillQueries>();
 
-// builder.Services.AddScoped<DbService>();
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PortfolioApiCorsPolicy", policy =>
@@ -65,11 +53,42 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+
+            ValidateAudience = true,
+
+            ValidateLifetime = true,
+
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = "PortfolioApi",
+
+            ValidAudience = "PortfolioApiUsers",
+
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("THIS_IS_A_VERY_SECRET_KEY_123456"))
+        };
+    });
+
+
+builder.Services.AddControllers();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+
+// Register Swagger generator and customize its behavior.
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage(); // 👈 ADD THIS
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -77,7 +96,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("PortfolioApiCorsPolicy");
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
